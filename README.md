@@ -1,39 +1,81 @@
-# StoPharma: AI-Driven Polypharmacology con Reti di Hopfield
+# StoPharma: AI-Driven Polypharmacology con Reti di Hopfield e Termodinamica Statistica
 
-**StoPharma** è un sistema di intelligenza artificiale basato su Reti Neurali di Hopfield e Simulated Annealing, progettato per esplorare il vasto spazio chimico delle combinazioni farmacologiche e suggerire nuovi cocktail terapeutici (polifarmacologia) a partire da dataset di prescrizioni esistenti.
+**StoPharma** è un sistema di intelligenza artificiale basato su Reti Neurali di Hopfield e Simulated Annealing, progettato per esplorare lo spazio combinatorio polifarmacologico. A partire da prescrizioni cliniche note, il sistema apprende l'intrinseca topologia relazionale tra principi attivi per "allucinare" nuovi cocktail terapeutici biologicamente ed energeticamente stabili.
 
-Il sistema memorizza associazioni virtuose tra farmaci noti, per poi utilizzare la termodinamica stocastica per allucinare nuovi stati (cocktail creativi) stabili, che vengono infine filtrati tramite regole farmacologiche e database medici reali (RxNorm).
+---
 
-## Architettura in 5 Step
+## Astrazione Matematica del Dominio Farmacologico
 
-1. **Ingestion & Builder**: Prende in input dataset FDA, estrae combinazioni di farmaci valide e le mappa in vettori binari.
-2. **Motore Deterministico (Hopfield)**: Apprende una matrice dei pesi $W$ usando la Regola di Hebb Centrata per catturare associazioni positive e negative tra farmaci. Una calibrazione fine del bias termodinamico ($\theta$) garantisce sparsità biologica (cocktail piccoli, es. 3-8 molecole).
-3. **Motore Creativo (Simulated Annealing)**: Invece di recuperare memorie esatte, il sistema inietta "temperatura" (rumore) e la fa scendere lentamente, forzando la rete a stabilizzarsi in *minimi locali spuri genuini* (le nostre combinazioni innovative).
-4. **Validazione e Triage**: I candidati generati passano attraverso un filtro di sicurezza locale (es. anti-conflitto per i FANS) e vengono interrogati contro l'API del governo USA (RxNorm) per scovare interazioni chimiche controindicate.
-5. **Output**: Un report dettagliato di cocktail sicuri e creativi pronti per la validazione in laboratorio.
+Il progetto traduce la polifarmacologia in un problema di meccanica statistica. Lo spazio chimico dei principi attivi è mappato in un vettore di spin (o neuroni di McCulloch-Pitts) $S \in \{-1, +1\}^N$, dove $N$ è il numero totale di molecole in vocabolario. 
+I "cocktail" farmacologici presenti nei dataset storici sono impressi come **memorie associative** (minimi energetici globali) in una Rete di Hopfield.
 
-## Installazione e Avvio
+L'Hamiltoniana del sistema (Energia) che descrive la stabilità di una specifica combinazione farmacologica è definita come:
+
+$$ E = -\frac{1}{2} S^T W S + \theta \sum_{i} S_i $$
+
+### Dinamiche di Apprendimento: Hebbian Learning e Covarianza
+La matrice delle interazioni sinaptiche $W$ (che rappresenta l'affinità o la repulsione chimico/terapeutica tra due farmaci) viene addestrata mediante la regola di Hebb basata sulla covarianza centrata sulle probabilità di attivazione. Questo accorgimento matematico è cruciale per dataset clinici fortemente sparsi (dove un paziente assume 4 farmaci su un vocabolario di 100), prevenendo il collasso dei pesi su valori negativi che "spegnerebbero" perennemente la rete.
+
+![Heatmap dei Pesi Sinaptici](results/W_heatmap.png)
+*(Matrice delle interazioni $W$. Le isole rosse indicano forte sinergia terapeutica appresa, quelle blu indicano repulsione o controindicazione).*
+
+### Il Ruolo di $\theta$: Campo Esterno e Matching the Data Statistics
+Il parametro $\theta$ introduce un *bias* globale che penalizza l'attivazione dei neuroni, spingendo il sistema verso lo stato di quiete ($S_i = -1$). 
+In letteratura fisica, questo approccio equivale a una **Rete di Hopfield con campo esterno uniforme**, ben documentata e studiata (*Amit et al., 1987, "Spin-glass models of neural networks with biased patterns"*).
+
+In StoPharma, abbiamo calibrato il parametro $\theta$ (Fase 2) effettuando uno sweep empirico per trovare il valore esatto che producesse vettori di stato con un numero di nodi attivi (4-8) coincidente con la media dei cocktail originali. Questo non è un mero trucco informatico, ma è la rigorosa applicazione del principio di **"matching the data statistics"**: lo stesso esatto fondamento teorico su cui si basa l'addestramento generativo delle *Restricted Boltzmann Machines* (RBM). Imponiamo, cioè, che l'aspettativa termodinamica della "magnetizzazione" del sistema simulato coincida con la magnetizzazione osservata nel dataset medico reale.
+
+### Esplorazione Entropica: Il Simulated Annealing
+Se la rete fosse lasciata evolvere a temperatura $T=0$, collasserebbe deterministicamente in uno dei cocktail già prescritti in passato (memoria perfetta).
+Per generare formulazioni polifarmacologiche *nuove*, iniettiamo energia termica (rumore) nel sistema, utilizzando la **Glauber Dynamics** (Simulated Annealing). 
+
+Abbassando gradualmente la temperatura, permettiamo al sistema di saltare fuori dalle valli dei pattern noti e di stabilizzarsi, per raffreddamento, nei **minimi locali spuri** (*spurious states*). Mentre nell'informatica tradizionale gli stati spuri di una rete di Hopfield sono considerati "rumore da evitare", in StoPharma essi rappresentano l'obiettivo primario: le **allucinazioni creative**. Sono combinazioni di farmaci mai viste prima, che tuttavia rispettano profondamente i vincoli chimico-terapeutici latenti codificati in $W$.
+
+![Curva di Simulated Annealing](results/sa_cooling_curve.png)
+*(Discesa termodinamica dell'energia del sistema al calare della temperatura (rumore) durante il Simulated Annealing).*
+
+---
+
+## Validazione Biologica ed Epatica (Triage)
+
+Gli *spurious states* generati matematicamente vengono infine passati attraverso un severo colino biologico e clinico (Fase 4 e Fase 6), per dimostrarne la cantierabilità nel mondo reale:
+
+1. **Esclusività di Target Competitivo (Es. FANS):** Filtri logici che escludono combinazioni tossiche derivanti dalla somministrazione di molecole con target enzimatico identico (es. inibizione COX condivisa tra Ibuprofene e Naprossene).
+2. **Interrogazione Database FDA (RxNorm):** Cross-check automatizzato via API per escludere cocktail noti per causare interazioni gravi.
+3. **ADMET Computazionale e Legge di Lipinski:** Tramite la libreria RDKit e PubChemPy, il sistema scarica le properties fisiche (SMILES) del cocktail generato e calcola il peso molecolare totale (valutando il carico epatico-renale) e la bio-disponibilità orale (LogP, H-Bonds), scartando le formulazioni non somministrabili.
+
+---
+
+## Struttura e Utilizzo (Pipeline)
 
 ### Requisiti
 - Python 3.10+
-- `numpy`, `pandas`, `matplotlib`, `requests`
+- `numpy`, `pandas`, `matplotlib`, `requests`, `pubchempy`
 
+### Esecuzione Modulare
+La pipeline simula l'intero ciclo di scoperta farmacologica:
 ```bash
-# Esempio di esecuzione della pipeline completa:
-python builder.py
-python fase1_validate.py
-python fase2_hopfield.py
-python theta_sweep.py           # Calibrazione empirica
-python fase3_annealing.py       # Generazione creativa
-python fase4_validation.py      # Triage finale
+python builder.py               # 1. Parsing prescrizioni 
+python fase1_validate.py        # 2. QA Dataset
+python fase2_hopfield.py        # 3. Hebbian Learning Matrix (W)
+python theta_sweep.py           # 4. Matching the data statistics (Calibrazione θ)
+python fase3_annealing.py       # 5. Generazione Entropica (Stati Spuri)
+python fase4_validation.py      # 6. Triage Interazioni (FANS / RxNorm)
+python fase6_biology.py         # 7. Check ADMET (Biodisponibilità)
 ```
 
-## Esempio di Output Generato
+Un output generato con successo apparirà come:
+```text
+Molecola           | MW (Da)  | LogP   | HBD | HBA | Violazioni Lipinski
+----------------------------------------------------------------------------
+acetaminophen      | 151.16   | 0.50   | 2   | 2   | 0 [OK]
+carisoprodol       | 260.33   | 1.90   | 2   | 4   | 0 [OK]
+...
 
-Cocktail originale validato senza interazioni note (Target: dolore acuto):
-- **Molecole**: `acetaminophen, aspirin, butalbital, caffeine, carisoprodol, codeine, dihydrocodeine, propoxyphene`
-- **Energia di Hopfield**: `-14.04`
-- **Overlap con il dataset noto**: `81.4%` (Nuovo al ~19%)
+-> Carico metabolico totale (Somma pesi molecolari): 1950.40 Da
+   [OK] Il carico molecolare totale e' entro limiti ragionevoli.
+   [OK] Ottima biodisponibilita' orale prevista per il cocktail.
+```
 
 ---
-*StoPharma è un proof of concept computazionale. Le combinazioni farmaceutiche generate non sostituiscono un trial clinico o il consulto di un medico.*
+*Disclaimer: StoPharma è un proof-of-concept di biologia computazionale. Le combinazioni farmaceutiche "allucinate" dall'intelligenza artificiale non sostituiscono in alcun modo protocolli clinici (PBPK Modeling, In-Vivo Trials) né il parere medico.*
