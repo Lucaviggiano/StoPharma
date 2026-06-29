@@ -1,7 +1,12 @@
-# fase1_build_dataset_v2.py
+# builder.py — Fase 1: Parsing prescrizioni FDA e codifica binaria
 import pandas as pd
 import numpy as np
 import zipfile, io, urllib.request, collections
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+DATA.mkdir(exist_ok=True)
 
 # ── 1. CARICA IL FILE GIÀ SCARICATO (o riscarica) ────────────────────────────
 # Se hai già il .zip scaricato, usalo direttamente:
@@ -157,14 +162,11 @@ mol_index = {name: i for i, name in enumerate(molecules_list)}
 print(f"\nN finale (nodi attivi): {N}")
 
 # ── 10. SALVA molecules.csv e combinations.csv ───────────────────────────────
-import os
-os.makedirs("data", exist_ok=True)
-
-pd.DataFrame({"id": range(N), "name": molecules_list}).to_csv("data/molecules.csv", index=False)
+pd.DataFrame({"id": range(N), "name": molecules_list}).to_csv(DATA / "molecules.csv", index=False)
 
 combos_out = combos_dedup[["Trade_Name", "canonical_key"]].copy()
 combos_out.columns = ["product_name", "ingredients"]
-combos_out.to_csv("data/combinations.csv", index=False)
+combos_out.to_csv(DATA / "combinations.csv", index=False)
 
 # ── 11. COSTRUISCI patterns.npy ──────────────────────────────────────────────
 P = len(combos_dedup)
@@ -173,7 +175,7 @@ for row_idx, key in enumerate(combos_dedup["canonical_key"]):
     for mol in key.split("|"):
         if mol in mol_index:
             patterns[row_idx, mol_index[mol]] = +1
-np.save("data/patterns.npy", patterns)
+np.save(DATA / "patterns.npy", patterns)
 
 # ── 12. REPORT FINALE ────────────────────────────────────────────────────────
 print(f"\n{'='*60}")

@@ -1,7 +1,12 @@
+# fase6_biology.py — Validazione biologica ADMET via PubChem
 import pandas as pd
 import pubchempy as pcp
 import time
 import ast
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+RESULTS = ROOT / "results"
 
 def check_lipinski(mw, logp, hbd, hba):
     """Calcola le violazioni della Regola del 5 di Lipinski (assorbimento orale)"""
@@ -17,7 +22,7 @@ print(" FASE 6: Validazione Biologica ADMET (PubChem API)")
 print("============================================================\n")
 
 try:
-    df = pd.read_csv("results/validated_combinations.csv")
+    df = pd.read_csv(RESULTS / "validated_combinations.csv")
     if df.empty:
         print("Nessun candidato da validare (file CSV vuoto).")
         exit(0)

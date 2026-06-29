@@ -1,14 +1,19 @@
-# fase4_validation.py
+# fase4_validation.py — Triage farmacologico (FANS + RxNorm)
 import numpy as np
 import pandas as pd
 import requests, time, json
 from itertools import combinations
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+RESULTS = ROOT / "results"
 
 # ── Carica dati e risultati SA ────────────────────────────────────────────────
-patterns  = np.load("data/patterns.npy").astype(np.float64)
-W         = np.load("data/W.npy")
-THETA     = float(np.load("data/theta.npy"))
-molecules = pd.read_csv("data/molecules.csv")
+patterns  = np.load(DATA / "patterns.npy").astype(np.float64)
+W         = np.load(DATA / "W.npy")
+THETA     = float(np.load(DATA / "theta.npy"))
+molecules = pd.read_csv(DATA / "molecules.csv")
 names     = molecules["name"].tolist()
 P, N      = patterns.shape
 
@@ -28,7 +33,7 @@ def decode(S):
 #   np.save("results/sa_states.npy", np.array(final_states))
 
 try:
-    sa_states = np.load("results/sa_states.npy")
+    sa_states = np.load(RESULTS / "sa_states.npy")
     print(f"Caricati {len(sa_states)} stati dal SA")
 except FileNotFoundError:
     print("[!] results/sa_states.npy non trovato.")
@@ -227,7 +232,7 @@ for c in rxnorm_results:
         "rxnorm_not_found": c.get("rxnorm", {}).get("not_found", []),
     })
 
-pd.DataFrame(output).to_csv("results/validated_combinations.csv", index=False)
+pd.DataFrame(output).to_csv(RESULTS / "validated_combinations.csv", index=False)
 print(f"\nSalvato results/validated_combinations.csv")
 print("\n-> Per i candidati top, cerca su PubMed:")
 for c in rxnorm_results[:3]:

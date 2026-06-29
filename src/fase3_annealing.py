@@ -1,16 +1,21 @@
+# fase3_annealing.py — Generazione creativa via Simulated Annealing
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 from hopfield_core import energy, glauber_step, overlap, corrupt
 
-os.makedirs("results", exist_ok=True)
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+RESULTS = ROOT / "results"
+RESULTS.mkdir(exist_ok=True)
 
 print("[Info] Caricamento dati...")
-patterns  = np.load("data/patterns.npy").astype(np.float64)
-W         = np.load("data/W.npy").astype(np.float64)
-THETA     = float(np.load("data/theta.npy"))
-molecules = pd.read_csv("data/molecules.csv")
+patterns  = np.load(DATA / "patterns.npy").astype(np.float64)
+W         = np.load(DATA / "W.npy").astype(np.float64)
+THETA     = float(np.load(DATA / "theta.npy"))
+molecules = pd.read_csv(DATA / "molecules.csv")
 P, N = patterns.shape
 names = molecules["name"].tolist()
 
@@ -94,7 +99,7 @@ plt.xlabel('Temperatura (T)')
 plt.ylabel('Energia (E)')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig('results/sa_cooling_curve.png', dpi=150)
+plt.savefig(RESULTS / 'sa_cooling_curve.png', dpi=150)
 plt.close()
 print("       Salvato in 'results/sa_cooling_curve.png'")
 
@@ -121,5 +126,5 @@ for name, init_fn in init_strategies.items():
     print(f"  > Init: {name:20s} -> {tipo} (Overlap Max: {max_ov:.2f}, Energia: {E_final:.2f})")
     final_states.append(S_final)
 
-np.save("results/sa_states.npy", np.array(final_states))
+np.save(RESULTS / "sa_states.npy", np.array(final_states))
 print(f"\n[Info] Salvati {len(final_states)} stati finali in 'results/sa_states.npy'")

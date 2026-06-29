@@ -1,11 +1,14 @@
-# theta_sweep.py
-# Trova il θ ottimale empiricamente sui tuoi dati reali.
-# Esegui nella cartella di progetto dopo fase2.
+# theta_sweep.py — Calibrazione empirica del bias theta
+# Sweep sui dati reali per trovare il theta ottimale (matching the data statistics).
+import numpy as np
+import pandas as pd
+from pathlib import Path
 
-import numpy as np, pandas as pd
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
 
-patterns = np.load("data/patterns.npy").astype(np.float64)
-W        = np.load("data/W.npy")
+patterns = np.load(DATA / "patterns.npy").astype(np.float64)
+W        = np.load(DATA / "W.npy")
 P, N     = patterns.shape
 
 def update_sync(W, S, theta):

@@ -168,15 +168,20 @@ propoxyphene       | 339.50   | 4.20   | 0   | 3   | 0 [OK]
 
 ```
 StoPharma/
-├── builder.py               # Fase 1: Parsing prescrizioni FDA e codifica binaria
-├── fase1_validate.py        # Fase 1: Quality Assurance del dataset
-├── fase2_hopfield.py        # Fase 2: Hebbian Learning (W) e test di recall
-├── theta_sweep.py           # Fase 2b: Sweep empirico per calibrazione θ
-├── fase3_annealing.py       # Fase 3: Simulated Annealing (generazione creativa)
-├── fase4_validation.py      # Fase 4: Triage FANS + RxNorm
-├── fase6_biology.py         # Fase 6: Check ADMET e Lipinski via PubChem
-├── hopfield_core.py         # Libreria condivisa: energy, update_sync, glauber_step, overlap
+├── run_pipeline.py          # Entry point: esegue l'intera pipeline
+├── requirements.txt         # Dipendenze Python
+├── README.md
 ├── demo.ipynb               # Notebook interattivo end-to-end
+├── src/
+│   ├── __init__.py
+│   ├── hopfield_core.py     # Libreria condivisa: energy, update_sync, glauber_step, overlap
+│   ├── builder.py           # Fase 1: Parsing prescrizioni FDA e codifica binaria
+│   ├── fase1_validate.py    # Fase 1: Quality Assurance del dataset
+│   ├── fase2_hopfield.py    # Fase 2: Hebbian Learning (W) e test di recall
+│   ├── theta_sweep.py       # Fase 2b: Sweep empirico per calibrazione θ
+│   ├── fase3_annealing.py   # Fase 3: Simulated Annealing (generazione creativa)
+│   ├── fase4_validation.py  # Fase 4: Triage FANS + RxNorm
+│   └── fase6_biology.py     # Fase 6: Check ADMET e Lipinski via PubChem
 ├── data/
 │   ├── molecules.csv        # Vocabolario dei 43 principi attivi
 │   ├── combinations.csv     # 65 prescrizioni cliniche reali
@@ -194,21 +199,25 @@ StoPharma/
 
 ### Requisiti
 - Python 3.10+
-- `numpy`, `pandas`, `matplotlib`, `requests`, `pubchempy`
 
 ```bash
-pip install numpy pandas matplotlib requests pubchempy
+pip install -r requirements.txt
 ```
 
 ### Esecuzione della Pipeline Completa
 ```bash
-python builder.py               # 1. Parsing prescrizioni e codifica binaria
-python fase1_validate.py        # 2. QA e statistiche del dataset
-python fase2_hopfield.py        # 3. Apprendimento matrice W + test recall
-python theta_sweep.py           # 4. Matching the data statistics (calibrazione θ)
-python fase3_annealing.py       # 5. Generazione entropica (Simulated Annealing)
-python fase4_validation.py      # 6. Triage interazioni (FANS + RxNorm)
-python fase6_biology.py         # 7. Check ADMET e biodisponibilità orale
+# Metodo 1: entry point unico (consigliato)
+python run_pipeline.py                # Tutte le fasi
+python run_pipeline.py 3 4 6          # Solo fasi selezionate
+
+# Metodo 2: esecuzione manuale fase per fase
+python src/builder.py                 # 1. Parsing prescrizioni e codifica binaria
+python src/fase1_validate.py          # 2. QA e statistiche del dataset
+python src/fase2_hopfield.py          # 3. Apprendimento matrice W + test recall
+python src/theta_sweep.py             # 4. Matching the data statistics
+python src/fase3_annealing.py         # 5. Generazione entropica (Simulated Annealing)
+python src/fase4_validation.py        # 6. Triage interazioni (FANS + RxNorm)
+python src/fase6_biology.py           # 7. Check ADMET e biodisponibilità orale
 ```
 
 ---

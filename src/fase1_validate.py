@@ -1,8 +1,13 @@
+# fase1_validate.py — Quality Assurance del dataset
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
-patterns  = np.load("data/patterns.npy")
-molecules = pd.read_csv("data/molecules.csv")
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+
+patterns  = np.load(DATA / "patterns.npy")
+molecules = pd.read_csv(DATA / "molecules.csv")
 P, N = patterns.shape
 names = molecules["name"].tolist()
 
@@ -24,7 +29,7 @@ if len(suspicious_small):
     print(f"  (!)  Pattern con <2 attivi: indice {suspicious_small}")
 
 # CHECK 2: coppie mai co-occorrenti
-print(f"\n[CHECK 2] Coppie mai co-occorrenti (W_ij sarà negativo):")
+print(f"\n[CHECK 2] Coppie mai co-occorrenti (W_ij sara' negativo):")
 never_together = []
 for i in range(N):
     for j in range(i+1, N):

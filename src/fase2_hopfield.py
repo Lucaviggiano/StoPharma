@@ -1,14 +1,18 @@
-# fase2_hopfield.py
+# fase2_hopfield.py — Hebbian Learning e test di recall
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 from hopfield_core import energy, update_sync, overlap, corrupt, recall
 
-os.makedirs("results", exist_ok=True)
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+RESULTS = ROOT / "results"
+RESULTS.mkdir(exist_ok=True)
 
-patterns  = np.load("data/patterns.npy").astype(np.float64)
-molecules = pd.read_csv("data/molecules.csv")
+patterns  = np.load(DATA / "patterns.npy").astype(np.float64)
+molecules = pd.read_csv(DATA / "molecules.csv")
 P, N = patterns.shape
 names = molecules["name"].tolist()
 
@@ -41,8 +45,8 @@ print(f"[W] Shape: {W.shape} | range [{W.min():.4f}, {W.max():.4f}]")
 print(f"[W] Pesi negativi: {(W<0).sum()/(N*N-N)*100:.1f}%")
 print(f"[theta] Soglia di attivazione: {THETA:.4f}")
 print(f"    (calibrata su densità target {density*100:.1f}%)")
-np.save("data/W.npy", W)
-np.save("data/theta.npy", np.array(THETA))   # salvalo - serve anche alla Fase 3
+np.save(DATA / "W.npy", W)
+np.save(DATA / "theta.npy", np.array(THETA))   # salvalo - serve anche alla Fase 3
 
 # ── Heatmap W ─────────────────────────────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(11, 9))
@@ -52,7 +56,7 @@ ax.set_yticks(range(N)); ax.set_yticklabels(names, fontsize=7)
 plt.colorbar(im, ax=ax, label="Peso W_ij")
 ax.set_title("Matrice dei pesi W (Hopfield - Regola di Hebb)")
 plt.tight_layout()
-plt.savefig("results/W_heatmap.png", dpi=150)
+plt.savefig(RESULTS / "W_heatmap.png", dpi=150)
 plt.close()
 print("Salvato results/W_heatmap.png")
 
