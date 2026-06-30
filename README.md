@@ -18,7 +18,7 @@ I *minimi globali* di questo paesaggio corrispondono alle prescrizioni già note
 ## Percorso del Progetto
 
 > **Nota di Espansione (Branch `develop`)**: 
-> La pipeline descritta di seguito si basa sull'architettura e sul dataset originale (*Orange Book*, $N=43$). Il sistema è stato successivamente espanso integrando il database **openFDA NDC** (raggiungendo $N=59$ molecole e 100 pattern) nel branch `develop`. Per tutti i dettagli tecnici sulle differenze, le calibrazioni termodinamiche e le analisi di biodisponibilità, consulta le [Note di Espansione](expansion_notes.md) sul branch `develop`.
+> La pipeline descritta di seguito si basa sull'architettura e sul dataset originale (*Orange Book*, $N=43$). Il sistema è stato successivamente espanso integrando il database **openFDA NDC** (raggiungendo $N=59$ molecole e 100 pattern) nel branch `develop`. Per tutti i dettagli tecnici sulle differenze, le calibrazioni termodinamiche e le analisi di biodisponibilità, consulta le [Note di Espansione](https://github.com/Lucaviggiano/StoPharma/blob/develop/expansion_notes.md) sul branch `develop`.
 
 Il lavoro è organizzato in otto fasi sequenziali. Ciascuna fase produce artefatti che alimentano la successiva, creando una pipeline di scoperta farmacologica completamente riproducibile.
 
