@@ -121,6 +121,23 @@ I candidati finali vengono sottoposti a un ultimo esame: la verifica della biodi
 
 Inoltre viene calcolato il **carico metabolico totale** (somma dei pesi molecolari), come indicatore grezzo del carico epatico-renale.
 
+### Fase 7 — Check Competizione Metabolica CYP450 (`fase7_cyp450.py`)
+
+La Fase 6 valuta ciascun farmaco *singolarmente* (Lipinski). Ma in un cocktail, il rischio principale è la **competizione metabolica**: più molecole processate dallo stesso enzima epatico del citocromo P450 (es. CYP3A4, CYP2D6) rallentano reciprocamente il proprio smaltimento, causando accumulo plasmatico e potenziale tossicità.
+
+Lo script interroga l'API REST di **KEGG Drug** per ogni principio attivo:
+1. Cerca l'ID KEGG del farmaco.
+2. Recupera dal record farmacologico gli isoenzimi CYP coinvolti nel metabolismo.
+3. Costruisce una matrice di competizione: se $\geq 3$ molecole del cocktail sono substrati dello stesso CYP, viene segnalato un **flag di competizione critica**.
+
+### Fase 8 — Network Pharmacology (`fase8_network.py`)
+
+L'ultimo livello di validazione analizza i **bersagli proteici** del cocktail per identificare convergenze farmaco-dinamiche potenzialmente pericolose. Lo script opera in tre step:
+
+1. **Target Discovery (STRING DB):** Per ogni principio attivo, interroga STRING per recuperare le proteine bersaglio umane ($\text{score} \geq 700$, alta confidenza).
+2. **Convergence Analysis:** Identifica proteine colpite da $\geq 2$ molecole del cocktail — potenziali punti di sinergia tossica.
+3. **Pathway Mapping (KEGG Pathway):** Per i target condivisi, risale ai pathway biochimici (es. metabolismo epatico, trasduzione del segnale) e segnala convergenze critiche ($\geq 3$ target sullo stesso pathway).
+
 ---
 
 ## Risultati Ottenuti
@@ -150,20 +167,27 @@ Inoltre viene calcolato il **carico metabolico totale** (somma dei pesi molecola
 | **Check RxNorm** | 0 interazioni note |
 | **Lipinski** | 0 violazioni su 9 molecole |
 
-### Dettaglio ADMET del Candidato Rank 1
+```
+
+### Dettaglio CYP450 del Candidato Rank 1
 
 ```
-Molecola           | MW (Da)  | LogP   | HBD | HBA | Violazioni Lipinski
-----------------------------------------------------------------------------
-acetaminophen      | 151.16   | 0.50   | 2   | 2   | 0 [OK]
-aspirin            | 180.16   | 1.20   | 1   | 4   | 0 [OK]
-butalbital         | 224.26   | 1.70   | 2   | 3   | 0 [OK]
-caffeine           | 194.19   | -0.10  | 0   | 3   | 0 [OK]
-carisoprodol       | 260.33   | 1.90   | 2   | 4   | 0 [OK]
-codeine            | 299.40   | 1.10   | 1   | 4   | 0 [OK]
-dihydrocodeine     | 301.40   | 2.20   | 1   | 4   | 0 [OK]
-propoxyphene       | 339.50   | 4.20   | 0   | 3   | 0 [OK]
+Molecola                       | KEGG ID    | Enzimi CYP metabolizzanti
+--------------------------------------------------------------------------------
+acetaminophen                  | D00217     | Nessun CYP noto
+aspirin                        | D00109     | Nessun CYP noto
+butalbital                     | D03182     | Nessun CYP noto
+caffeine                       | D00528     | CYP1A2, CYP2E1, CYP3A4
+carisoprodol                   | D00768     | CYP2C19
+codeine                        | D00195     | CYP2D6, CYP3A4
+dihydrocodeine                 | D01481     | CYP2D6, CYP3A4
+propoxyphene                   | D00482     | Nessun CYP noto
+
+-> CYP3A4: 3 substrati (caffeine, codeine, dihydrocodeine)  [!] COMPETIZIONE
+-> Tutti gli altri CYP: nessuna competizione critica          [OK]
 ```
+
+> **Nota clinica:** La competizione su CYP3A4 è un risultato atteso e clinicamente rilevante. In un contesto terapeutico reale, il dosaggio di caffeina e degli oppioidi andrebbe aggiustato per compensare il rallentamento metabolico reciproco. Questo flag — che la Fase 6 (Lipinski) non poteva catturare — dimostra il valore aggiunto del check CYP450.
 
 ---
 
@@ -184,7 +208,9 @@ StoPharma/
 │   ├── theta_sweep.py       # Fase 2b: Sweep empirico per calibrazione θ
 │   ├── fase3_annealing.py   # Fase 3: Simulated Annealing (generazione creativa)
 │   ├── fase4_validation.py  # Fase 4: Triage FANS + RxNorm
-│   └── fase6_biology.py     # Fase 6: Check ADMET e Lipinski via PubChem
+│   ├── fase6_biology.py     # Fase 6: Check ADMET e Lipinski via PubChem
+│   ├── fase7_cyp450.py      # Fase 7: Check competizione metabolica CYP450 via KEGG
+│   └── fase8_network.py     # Fase 8: Network Pharmacology via STRING + KEGG Pathway
 ├── data/
 │   ├── molecules.csv        # Vocabolario dei 43 principi attivi
 │   ├── combinations.csv     # 65 prescrizioni cliniche reali
@@ -210,7 +236,7 @@ pip install -r requirements.txt
 ### Esecuzione della Pipeline Completa
 ```bash
 # Metodo 1: entry point unico (consigliato)
-python run_pipeline.py                # Tutte le fasi
+python run_pipeline.py                # Tutte le fasi (1-8)
 python run_pipeline.py 3 4 6          # Solo fasi selezionate
 
 # Metodo 2: esecuzione manuale fase per fase
@@ -221,6 +247,8 @@ python src/theta_sweep.py             # 4. Matching the data statistics
 python src/fase3_annealing.py         # 5. Generazione entropica (Simulated Annealing)
 python src/fase4_validation.py        # 6. Triage interazioni (FANS + RxNorm)
 python src/fase6_biology.py           # 7. Check ADMET e biodisponibilità orale
+python src/fase7_cyp450.py            # 8. Check competizione CYP450 (KEGG)
+python src/fase8_network.py           # 9. Network Pharmacology (STRING + KEGG)
 ```
 
 ---
@@ -229,29 +257,11 @@ python src/fase6_biology.py           # 7. Check ADMET e biodisponibilità orale
 
 ### Ampliamento dello Spazio dei Principi Attivi
 
-L'architettura del sistema è stata progettata per scalare. La complessità dell'apprendimento Hebbiano è $O(N^2 \cdot P)$, il che rende il passaggio da $N = 43$ a $N = 500$ o $N = 1000$ molecole computazionalmente triviale anche su hardware consumer. Il vincolo matematico della capacità della rete di Hopfield ($P_{\max} \approx 0.14N$) implica che aumentando il vocabolario $N$ si *aumenta* anche il numero di pattern memorizzabili senza saturazione (regime spin-glass). Ad esempio:
-
-| Scala | $N$ (molecole) | $P_{\max}$ (pattern) | Spazio combinatorio |
-|:------|:-:|:-:|:-:|
-| Attuale | 43 | 6 (*) | ~$10^{12}$ |
-| Media | 200 | 28 | ~$10^{60}$ |
-| Grande | 1000 | 140 | ~$10^{301}$ |
-
-(*) Il nostro esperimento opera con $P = 65$ pattern su $N = 43$ nodi, ben oltre la capacità teorica. Questo regime *saturo* è deliberato: la rete non può recuperare fedelmente tutte le memorie, ma genera un paesaggio energetico ricco di minimi spuri — esattamente ciò che desideriamo per la creatività farmacologica.
-
-Per espandere lo spazio dei principi attivi, l'unica modifica necessaria è ampliare i file `molecules.csv` e `combinations.csv`, poi rieseguire l'intera pipeline. Il parametro $\theta$ verrà automaticamente ricalibrato dallo sweep.
-
-### Check Metabolici Avanzati (CYP450)
-
-Un'estensione naturale della Fase 6 consiste nell'integrare i dati del *Citocromo P450*. Il rischio principale di cocktail con 8+ molecole è la competizione metabolica sugli stessi enzimi epatici (es. CYP3A4, CYP2D6). Incrociando i dati di *DrugBank Open Data* o *KEGG Drug Metabolism*, si può aggiungere un filtro che scarti cocktail con più di 2 molecole metabolizzate dallo stesso isoenzima.
+L'architettura del sistema è stata progettata per scalare. La complessità dell'apprendimento Hebbiano è $O(N^2 \cdot P)$, il che rende il passaggio da $N = 43$ a $N = 500$ o $N = 1000$ molecole computazionalmente triviale anche su hardware consumer. Il vincolo matematico della capacità della rete di Hopfield ($P_{\max} \approx 0.14N$) implica che aumentando il vocabolario $N$ si *aumenta* anche il numero di pattern memorizzabili senza saturazione (regime spin-glass). Il vincolo reale è la **copertura dati**: ogni molecola aggiunta deve apparire in un numero sufficiente di pattern ($\geq 5$) affinché i pesi Hebbiani siano statisticamente informativi.
 
 ### Simulazioni PBPK e Docking Molecolare
 
-Per validare ulteriormente i candidati generati da StoPharma in un contesto pre-clinico, il passo successivo sarebbe l'integrazione con software di farmacocinetica fisiologica (PBPK Modeling, es. *Simcyp*, *GastroPlus*) o di Docking Molecolare (es. *AutoDock Vina*, *Schrödinger Suite*), che modellano rispettivamente l'assorbimento/distribuzione/metabolismo/escrezione (ADME) e l'interazione tridimensionale farmaco-recettore.
-
-### Network Pharmacology
-
-Tramite database genomici come *STRING* o *KEGG Pathways*, è possibile costruire il grafo delle proteine bersaglio dell'intero cocktail, verificando che i pathway biochimici secondari non inneschino effetti avversi sinergici (es. depressione respiratoria da sovra-stimolazione combinata dei recettori mu-oppioidi).
+Per validare ulteriormente i candidati generati da StoPharma in un contesto pre-clinico, il passo successivo sarebbe l'integrazione con software di farmacocinetica fisiologica (PBPK Modeling, es. *Simcyp*, *GastroPlus*) o di Docking Molecolare (es. *AutoDock Vina*, *Schrödinger Suite*), che modellano rispettivamente l'assorbimento/distribuzione/metabolismo/escrezione (ADME) e l'interazione tridimensionale farmaco-recettore. Questi strumenti richiedono software specialistico e competenze bioinformatiche dedicate, e rappresentano il naturale passo successivo rispetto alla validazione API-based implementata nelle Fasi 6-8.
 
 ---
 
