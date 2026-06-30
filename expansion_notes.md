@@ -54,7 +54,7 @@ Nuovo sweep eseguito su `W.npy` (59×59):
 
 > **Nota di correzione:** una prima stesura di questo changelog riportava erroneamente θ=0.70 come valore calibrato, in contraddizione con θ=0.50 usato a valle nelle Fasi 4 e 6. Il valore corretto ed effettivamente utilizzato per tutti i risultati riportati in questo documento e nel README è **θ=0.50**. La scelta riflette il trade-off identificato durante la calibrazione: a θ=0.70-0.80 l'overlap con i pattern di training cresce rapidamente (fino al 99% a θ=0.80), perché la densità target imposta da θ alto coincide con la densità stessa dei dati di training (2.5 farmaci/pattern), facendo collassare la generazione in puro recall. θ=0.50 mantiene un margine di overlap sufficiente a preservare la generazione di stati genuinamente nuovi, al prezzo di cocktail leggermente più densi della media del dataset.
 
-## Risultati delle Fasi 3-4-6 sul dataset unito
+## Risultati delle Fasi 3-4-6-7-8 sul dataset unito
 
 **Simulated Annealing (Fase 3):** 33 stati termodinamici generati, 100% con overlap medio-basso rispetto ai pattern di training — nessun trial ricaduto identicamente in una formulazione nota.
 
@@ -62,6 +62,151 @@ Nuovo sweep eseguito su `W.npy` (59×59):
 
 > **Nota sulla soglia di originalità:** il valore di overlap massimo 0.96 osservato tra gli stati "genuini" è più alto della soglia <0.60 raccomandata nella roadmap originale per definire uno stato come genuinamente nuovo. Questo singolo caso limite andrebbe rivisto separatamente — un overlap così alto è prossimo al comportamento di puro recall, non di generazione. Si raccomanda di verificare la distribuzione completa degli overlap dei 29 stati (non solo il massimo) prima di considerare l'intero batch validato.
 
-**Validazione ADMET (Fase 6):** candidato Rank 1 — `acetaminophen + chlorpheniramine + dextromethorphan + guaifenesin + phenylephrine` — supera la Regola di Lipinski su tutte le 5 molecole (0 violazioni), con carico metabolico totale di 1143.67 Da.
+---
 
-Osservazione qualitativa rilevante: questa combinazione corrisponde, nella sostanza, alla formulazione tipica di un decongestionante multi-sintomo da banco. La rete l'ha prodotta come stato spurio partendo da correlazioni statistiche pure, senza che la categoria terapeutica "antinfluenzale multi-sintomo" fosse mai codificata esplicitamente nel sistema — un indizio che la matrice W cattura struttura farmacologica reale, non solo rumore.
+### Validazione ADMET — Fase 6 (PubChem API)
+
+#### Rank 1 (5 principi attivi)
+**Cocktail:** `acetaminophen, chlorpheniramine, dextromethorphan hydrobromide, guaifenesin, phenylephrine`
+
+| Molecola                      | MW (Da)  | LogP   | HBD | HBA | Violazioni Lipinski |
+|-------------------------------|----------|--------|-----|-----|---------------------|
+| acetaminophen                 | 151.16   | 0.50   | 2   | 2   | 0 [OK]              |
+| chlorpheniramine              | 274.79   | 3.40   | 0   | 2   | 0 [OK]              |
+| dextromethorphan hydrobromide | 352.30   | 0.00   | 1   | 2   | 0 [OK]              |
+| guaifenesin                   | 198.22   | 1.40   | 2   | 4   | 0 [OK]              |
+| phenylephrine                 | 167.20   | -0.30  | 3   | 3   | 0 [OK]              |
+
+**Carico metabolico totale:** 1143.67 Da — Ottima biodisponibilità orale.
+
+#### Rank 2 (7 principi attivi)
+**Cocktail:** `acetaminophen, chlorpheniramine, dextromethorphan hydrobromide, guaifenesin, hydrocodone, phenylephrine, pseudoephedrine`
+
+| Molecola                      | MW (Da)  | LogP   | HBD | HBA | Violazioni Lipinski |
+|-------------------------------|----------|--------|-----|-----|---------------------|
+| acetaminophen                 | 151.16   | 0.50   | 2   | 2   | 0 [OK]              |
+| chlorpheniramine              | 274.79   | 3.40   | 0   | 2   | 0 [OK]              |
+| dextromethorphan hydrobromide | 352.30   | 0.00   | 1   | 2   | 0 [OK]              |
+| guaifenesin                   | 198.22   | 1.40   | 2   | 4   | 0 [OK]              |
+| hydrocodone                   | 299.40   | 2.20   | 0   | 4   | 0 [OK]              |
+| phenylephrine                 | 167.20   | -0.30  | 3   | 3   | 0 [OK]              |
+| pseudoephedrine               | 165.23   | 0.90   | 2   | 2   | 0 [OK]              |
+
+**Carico metabolico totale:** 1608.30 Da — Ottima biodisponibilità orale.
+
+#### Rank 3 (8 principi attivi)
+**Cocktail:** `acetaminophen, chlorpheniramine, dextromethorphan hydrobromide, guaifenesin, hydrocodone, ibuprofen, phenylephrine, pseudoephedrine`
+
+| Molecola                      | MW (Da)  | LogP   | HBD | HBA | Violazioni Lipinski |
+|-------------------------------|----------|--------|-----|-----|---------------------|
+| acetaminophen                 | 151.16   | 0.50   | 2   | 2   | 0 [OK]              |
+| chlorpheniramine              | 274.79   | 3.40   | 0   | 2   | 0 [OK]              |
+| dextromethorphan hydrobromide | 352.30   | 0.00   | 1   | 2   | 0 [OK]              |
+| guaifenesin                   | 198.22   | 1.40   | 2   | 4   | 0 [OK]              |
+| hydrocodone                   | 299.40   | 2.20   | 0   | 4   | 0 [OK]              |
+| ibuprofen                     | 206.28   | 3.50   | 1   | 2   | 0 [OK]              |
+| phenylephrine                 | 167.20   | -0.30  | 3   | 3   | 0 [OK]              |
+| pseudoephedrine               | 165.23   | 0.90   | 2   | 2   | 0 [OK]              |
+
+**Carico metabolico totale:** 1814.58 Da — Ottima biodisponibilità orale (sotto soglia 2000 Da).
+
+**Conclusione ADMET:** 0 violazioni Lipinski su tutti e 3 i cocktail. Nessun candidato supera la soglia d'allerta del carico molecolare.
+
+---
+
+### Competizione Metabolica CYP450 — Fase 7 (KEGG API)
+
+#### Rank 1 (5 principi attivi)
+
+| Molecola                      | KEGG ID  | Enzimi CYP metabolizzanti       |
+|-------------------------------|----------|----------------------------------|
+| acetaminophen                 | D00217   | CYP1A2, CYP2E1, CYP3A4         |
+| chlorpheniramine              | D00665   | CYP2D6                          |
+| dextromethorphan hydrobromide | D00697   | CYP2D6, CYP3A4                  |
+| guaifenesin                   | D00357   | Nessun CYP noto                 |
+| phenylephrine                 | D00483   | Nessun CYP noto                 |
+
+**Competizione rilevata:**
+- CYP2D6: 2 substrati (chlorpheniramine, dextromethorphan) — [OK]
+- CYP3A4: 2 substrati (acetaminophen, dextromethorphan) — [OK]
+- **Nessuna competizione critica (≥3 substrati/CYP).**
+
+#### Rank 2 (7 principi attivi)
+
+| Molecola                      | KEGG ID  | Enzimi CYP metabolizzanti       |
+|-------------------------------|----------|----------------------------------|
+| acetaminophen                 | D00217   | CYP1A2, CYP2E1, CYP3A4         |
+| chlorpheniramine              | D00665   | CYP2D6                          |
+| dextromethorphan hydrobromide | D00697   | CYP2D6, CYP3A4                  |
+| guaifenesin                   | D00357   | Nessun CYP noto                 |
+| hydrocodone                   | D08047   | CYP2D6, CYP3A4                  |
+| phenylephrine                 | D00483   | Nessun CYP noto                 |
+| pseudoephedrine               | D00489   | Nessun CYP noto                 |
+
+**Competizione rilevata:**
+- **CYP2D6: 3 substrati (chlorpheniramine, dextromethorphan, hydrocodone) — [!] COMPETIZIONE**
+- **CYP3A4: 3 substrati (acetaminophen, dextromethorphan, hydrocodone) — [!] COMPETIZIONE**
+
+> L'aggiunta di hydrocodone nel Rank 2 innesca la soglia critica su due isoenzimi contemporaneamente. Clinicamente, questo implica che il metabolismo di tutti e tre i substrati rallenterebbe per inibizione competitiva, con rischio di accumulo plasmatico degli oppioidi (hydrocodone) e dell'antitussivo (dextromethorphan).
+
+#### Rank 3 (8 principi attivi)
+
+Identico al Rank 2 per il profilo CYP, con l'aggiunta di ibuprofen che viene metabolizzato da CYP2C9 (isoenzima non condiviso con gli altri substrati).
+
+**Competizione rilevata:** stesse 2 competizioni critiche del Rank 2 (CYP2D6 e CYP3A4), ibuprofen non aggiunge conflitto.
+
+**Riepilogo CYP450:**
+
+| Rank | Conflitti CYP | Isoenzimi critici | Verdetto |
+|------|--------------|-------------------|----------|
+| 1    | 0            | —                 | **OK**   |
+| 2    | 2            | CYP2D6, CYP3A4   | **RISCHIO** |
+| 3    | 2            | CYP2D6, CYP3A4   | **RISCHIO** |
+
+---
+
+### Network Pharmacology — Fase 8 (STRING + KEGG Pathway)
+
+#### Rank 1 (5 principi attivi)
+
+- **Target proteici trovati:** 10 (tutti via phenylephrine → GNB1, GNAQ, GNAO1, GNG2, GNA12, GNA11, GNA13, GNAS, GNB2, ADRA1A)
+- **Target condivisi (2+ molecole):** 0
+- **Pathway con convergenza critica (≥3 target):**
+  - Hormone signaling: 4 target convergenti — **[!] CONVERGENZA**
+  - Neuroactive ligand signaling: 3 target — **[!] CONVERGENZA**
+  - cGMP-PKG signaling pathway: 3 target — **[!] CONVERGENZA**
+
+#### Rank 2 (7 principi attivi)
+
+- **Target proteici trovati:** 10 (phenylephrine domina il profilo target)
+- **Target condivisi:** 0
+- **Pathway con convergenza critica:**
+  - Hormone signaling: 3 target — **[!] CONVERGENZA**
+  - Neuroactive ligand signaling: 3 target — **[!] CONVERGENZA**
+  - cGMP-PKG signaling pathway: 3 target — **[!] CONVERGENZA**
+
+#### Rank 3 (8 principi attivi)
+
+- **Target proteici trovati:** 11 (ibuprofen aggiunge SLC34A1)
+- **Target condivisi:** 0
+- **Pathway con convergenza critica:**
+  - Hormone signaling: 3 target — **[!] CONVERGENZA**
+  - cGMP-PKG signaling pathway: 3 target — **[!] CONVERGENZA**
+
+**Riepilogo Network Pharmacology:**
+
+| Rank | Target totali | Target condivisi | Pathway critici | Verdetto |
+|------|--------------|-----------------|-----------------|----------|
+| 1    | 10           | 0               | 3               | **CONVERGENZA** |
+| 2    | 10           | 0               | 3               | **CONVERGENZA** |
+| 3    | 11           | 0               | 2               | **CONVERGENZA** |
+
+> **Nota interpretativa:** La convergenza pathway è guidata quasi interamente da phenylephrine (agonista adrenergico α1), che attiva molteplici proteine G (GNA11, GNA13, GNAQ, GNB1, GNAO1) coinvolte nei pathway di signaling ormonale e vascolare. Questo è un comportamento farmacologico atteso e ben documentato per i simpaticomimetici, non un artefatto. In contesto clinico, la convergenza segnala il rischio di vasocostrizione eccessiva e ipertensione — effetto collaterale noto della phenylephrine e motivo per cui i decongestionanti sono controindicati nei pazienti ipertesi. I target non sono condivisi tra molecole diverse del cocktail, il che indica che la convergenza è monofattoriale (un singolo farmaco, non una sinergia tossica tra farmaci).
+
+---
+
+## Osservazione qualitativa finale
+
+La combinazione Rank 1 corrisponde, nella sostanza, alla formulazione tipica di un decongestionante multi-sintomo da banco. La rete l'ha prodotta come stato spurio partendo da correlazioni statistiche pure, senza che la categoria terapeutica "antinfluenzale multi-sintomo" fosse mai codificata esplicitamente nel sistema — un indizio che la matrice W cattura struttura farmacologica reale, non solo rumore.
+
+Il Rank 1 emerge come il candidato più pulito: 0 violazioni Lipinski, 0 conflitti CYP450, e convergenze pathway monofattoriali (non sinergiche). I Rank 2 e 3, pur biologicamente validi (Lipinski OK), presentano competizione metabolica su CYP2D6 e CYP3A4 dovuta all'aggiunta di hydrocodone — un rischio clinicamente rilevante che le Fasi 6 e precedenti non avrebbero potuto identificare.
