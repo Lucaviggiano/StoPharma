@@ -1,44 +1,60 @@
 id,name
 0,acetaminophen
-1,aspirin
-2,benzhydrocodone
-3,bupivacaine
-4,buprenorphine
-5,butalbital
-6,caffeine
-7,carisoprodol
-8,celecoxib
-9,chlorpheniramine
-10,codeine
-11,diclofenac
-12,dihydrocodeine
-13,diphenhydramine
-14,dipyridamole
-15,ergotamine
-16,esomeprazole
-17,famotidine
-18,guaifenesin
-19,homatropine
-20,hydrocodone
-21,ibuprofen
-22,ketorolac
-23,lansoprazole
-24,meloxicam
-25,meprobamate
-26,methocarbamol
-27,misoprostol
-28,morphine
-29,naloxone
-30,naltrexone
-31,naproxen
-32,omeprazole
-33,orphenadrine
-34,oxycodone
-35,pentazocine
-36,phenylephrine
-37,promethazine
-38,propoxyphene
-39,pseudoephedrine
-40,sumatriptan
-41,tramadol
-42,triprolidine
+1,anhydrous citric acid
+2,aspirin
+3,avena sativa flowering top
+4,benzhydrocodone
+5,bupivacaine
+6,buprenorphine
+7,butalbital
+8,caffeine
+9,carisoprodol
+10,celecoxib
+11,chlorpheniramine
+12,cinchona officinalis bark
+13,cinnamon
+14,codeine
+15,dexbrompheniramine maleate
+16,dextromethorphan hydrobromide
+17,diclofenac
+18,dihydrocodeine
+19,diphenhydramine
+20,dipyridamole
+21,doxylamine succinate
+22,ergotamine
+23,esomeprazole
+24,famotidine
+25,guaifenesin
+26,homatropine
+27,hydrocodone
+28,hyoscyamus niger
+29,ibuprofen
+30,ketorolac
+31,lansoprazole
+32,lycopodium clavatum spore
+33,meloxicam
+34,meprobamate
+35,methocarbamol
+36,misoprostol
+37,morphine
+38,naloxone
+39,naloxone hydrochloride dihydrate
+40,naltrexone
+41,naproxen
+42,omeprazole
+43,orphenadrine
+44,oxycodone
+45,"oyster shell calcium carbonate, crude"
+46,pamabrom
+47,pentazocine
+48,phenylephrine
+49,phenylephrine bitartrate
+50,promethazine
+51,propoxyphene
+52,pseudoephedrine
+53,pyrilamine maleate
+54,rizatriptan benzoate
+55,sodium bicarbonate
+56,sumatriptan
+57,tramadol
+58,triprolidine

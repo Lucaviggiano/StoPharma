@@ -1,3 +1,4 @@
 rank,molecules,energy,overlap_max,n_active,fans_ok,rxnorm_interactions,rxnorm_not_found
-1,"['acetaminophen', 'aspirin', 'butalbital', 'caffeine', 'carisoprodol', 'codeine', 'dihydrocodeine', 'propoxyphene']",-14.0463,0.814,8,True,0,[]
-2,"['acetaminophen', 'aspirin', 'butalbital', 'caffeine', 'carisoprodol', 'codeine', 'dihydrocodeine', 'pentazocine', 'propoxyphene']",-13.9043,0.7674,9,True,0,[]
+1,"['acetaminophen', 'chlorpheniramine', 'dextromethorphan hydrobromide', 'guaifenesin', 'phenylephrine']",-27.4953,0.9661,5,True,0,"['acetaminophen', 'chlorpheniramine', 'dextromethorphan hydrobromide', 'guaifenesin', 'phenylephrine']"
+2,"['acetaminophen', 'chlorpheniramine', 'dextromethorphan hydrobromide', 'guaifenesin', 'hydrocodone', 'phenylephrine', 'pseudoephedrine']",-27.6241,0.8983,7,True,0,"['acetaminophen', 'chlorpheniramine', 'dextromethorphan hydrobromide', 'guaifenesin', 'hydrocodone', 'phenylephrine', 'pseudoephedrine']"
+3,"['acetaminophen', 'chlorpheniramine', 'dextromethorphan hydrobromide', 'guaifenesin', 'hydrocodone', 'ibuprofen', 'phenylephrine', 'pseudoephedrine']",-27.7658,0.8644,8,True,0,"['acetaminophen', 'chlorpheniramine', 'dextromethorphan hydrobromide', 'guaifenesin', 'hydrocodone', 'ibuprofen', 'phenylephrine', 'pseudoephedrine']"

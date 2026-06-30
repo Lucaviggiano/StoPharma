@@ -60,9 +60,9 @@ for i, S in enumerate(sa_states):
 # Ordina per overlap crescente (più originali prima) e poi energia
 candidates.sort(key=lambda x: (x["overlap_max"], x["energy"]))
 
-genuine = [c for c in candidates if c["overlap_max"] < 0.85 and c["n_active"] <= 12]
+genuine = [c for c in candidates if c["overlap_max"] < 0.99 and c["n_active"] <= 12]
 print(f"  Totale stati SA: {len(sa_states)}")
-print(f"  Genuini (overlap<0.85 e <=12 attivi): {len(genuine)}")
+print(f"  Genuini (overlap<0.99 e <=12 attivi): {len(genuine)}")
 
 # Deduplicazione: rimuovi stati identici
 seen_keys = set()
