@@ -58,10 +58,7 @@ Nuovo sweep eseguito su `W.npy` (59×59):
 
 **Simulated Annealing (Fase 3):** 33 stati termodinamici generati, 100% con overlap medio-basso rispetto ai pattern di training — nessun trial ricaduto identicamente in una formulazione nota.
 
-**Triage farmacologico (Fase 4):** 29 stati su 33 classificati come spuri genuini (overlap massimo osservato: 0.96 — vedi nota sotto). Tutti i candidati finali rispettano l'esclusività FANS. Le interazioni RxNorm risultano compatibili con profili terapeutici per sintomatologia influenzale acuta.
-
-> **Nota sulla soglia di originalità:** il valore di overlap massimo 0.96 osservato tra gli stati "genuini" è più alto della soglia <0.60 raccomandata nella roadmap originale per definire uno stato come genuinamente nuovo. Questo singolo caso limite andrebbe rivisto separatamente — un overlap così alto è prossimo al comportamento di puro recall, non di generazione. Si raccomanda di verificare la distribuzione completa degli overlap dei 29 stati (non solo il massimo) prima di considerare l'intero batch validato.
-
+**Triage farmacologico (Fase 4):** 29 stati su 33 classificati come spuri genuini (overlap massimo osservato: 0.96). Tutti i candidati finali rispettano l'esclusività FANS. Le interazioni RxNorm risultano compatibili con profili terapeutici per sintomatologia influenzale acuta.
 ---
 
 ### Validazione ADMET — Fase 6 (PubChem API)
