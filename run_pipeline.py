@@ -4,7 +4,7 @@ run_pipeline.py — Entry point per l'intera pipeline StoPharma.
 Esegue le fasi in sequenza dalla root del progetto.
 
 Uso:
-    python run_pipeline.py          # Esegue tutte le fasi (1-6)
+    python run_pipeline.py          # Esegue tutte le fasi (1-8)
     python run_pipeline.py 3 4      # Esegue solo le fasi 3 e 4
 """
 import subprocess, sys
@@ -21,9 +21,11 @@ PHASES = {
     "3": ("fase3_annealing.py", "Fase 3: Simulated Annealing"),
     "4": ("fase4_validation.py","Fase 4: Triage FANS + RxNorm"),
     "6": ("fase6_biology.py",   "Fase 6: Check ADMET (Lipinski)"),
+    "7": ("fase7_cyp450.py",    "Fase 7: Check CYP450 (KEGG)"),
+    "8": ("fase8_network.py",   "Fase 8: Network Pharmacology (STRING + KEGG)"),
 }
 
-ALL_ORDER = ["1", "1v", "2", "2b", "3", "4", "6"]
+ALL_ORDER = ["1", "1v", "2", "2b", "3", "4", "6", "7", "8"]
 
 def run_phase(key):
     script, desc = PHASES[key]
