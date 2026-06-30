@@ -20,7 +20,7 @@ I *minimi globali* di questo paesaggio corrispondono alle prescrizioni già note
 > **Nota di Espansione (Branch `develop`)**: 
 > La pipeline descritta di seguito si basa sull'architettura e sul dataset originale (*Orange Book*, $N=43$). Il sistema è stato successivamente espanso integrando il database **openFDA NDC** (raggiungendo $N=59$ molecole e 100 pattern) nel branch `develop`. Per tutti i dettagli tecnici sulle differenze, le calibrazioni termodinamiche e le analisi di biodisponibilità, consulta le [Note di Espansione](expansion_notes.md) sul branch `develop`.
 
-Il lavoro è organizzato in sei fasi sequenziali. Ciascuna fase produce artefatti che alimentano la successiva, creando una pipeline di scoperta farmacologica completamente riproducibile.
+Il lavoro è organizzato in otto fasi sequenziali. Ciascuna fase produce artefatti che alimentano la successiva, creando una pipeline di scoperta farmacologica completamente riproducibile.
 
 ### Fase 1 — Costruzione del Dataset (`builder.py`, `fase1_validate.py`)
 
@@ -41,13 +41,13 @@ L'apprendimento della rete avviene tramite la **regola di Hebb nella variante ce
 
 $$ W_{ij} = \frac{1}{P} \sum_{\mu=1}^{P} (\xi^\mu_i - \bar{\xi}_i)(\xi^\mu_j - \bar{\xi}_j), \quad W_{ii} = 0 $$
 
-dove $\bar{\xi}_i = \frac{1}{P}\sum_\mu \xi^\mu_i$ è la media empirica di attivazione del neurone $i$ su tutti i pattern.
+dove $`\bar{\xi}_i = \frac{1}{P}\sum_\mu \xi^\mu_i`$ è la media empirica di attivazione del neurone $i$ su tutti i pattern.
 
 La centratura è un dettaglio tecnico cruciale per il nostro dominio. I dati farmacologici sono intrinsecamente sparsi: la media di attivazione è $\bar{\xi}_i \approx -0.89$ (un farmaco è "presente" solo nel ~5% delle prescrizioni). Senza centratura, la regola di Hebb standard produrrebbe pesi prevalentemente negativi, e la rete collasserebbe nello stato $S = (-1, -1, \ldots, -1)$ ("nessun farmaco attivo"), che è biologicamente triviale e privo di interesse.
 
 ![Heatmap dei Pesi Sinaptici](results/W_heatmap.png)
 
-*Heatmap della matrice $W$ (43×43). Le isole rosse evidenziano cluster di sinergia terapeutica appresa (es. codeina-acetaminofene, comuni in formulazioni analgesiche combinate). Le regioni blu indicano repulsione o incompatibilità chimica.*
+*Heatmap della matrice $`W`$ (43×43). Le isole rosse evidenziano cluster di sinergia terapeutica appresa (es. codeina-acetaminofene, comuni in formulazioni analgesiche combinate). Le regioni blu indicano repulsione o incompatibilità chimica.*
 
 ### Fase 2b — Calibrazione del Bias $\theta$: Matching the Data Statistics (`theta_sweep.py`)
 
