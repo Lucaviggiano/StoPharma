@@ -154,6 +154,8 @@ L'ultimo livello di validazione analizza i **bersagli proteici** del cocktail pe
 | **Check RxNorm** | 0 interazioni note |
 | **Lipinski** | 0 violazioni su 8 molecole |
 | **Carico metabolico** | 1950 Da (entro soglia di sicurezza) |
+| **Competizione CYP450** | 1 conflitto (CYP3A4) |
+| **Network Pharmacology**| 1 target, 0 convergenze pathway |
 
 ### Candidato Rank 2 — Cocktail "StoPharma-02"
 
@@ -166,8 +168,8 @@ L'ultimo livello di validazione analizza i **bersagli proteici** del cocktail pe
 | **Check FANS** | Superato |
 | **Check RxNorm** | 0 interazioni note |
 | **Lipinski** | 0 violazioni su 9 molecole |
-
-```
+| **Competizione CYP450** | 1 conflitto (CYP3A4) |
+| **Network Pharmacology**| 1 target, 0 convergenze pathway |
 
 ### Dettaglio CYP450 del Candidato Rank 1
 
